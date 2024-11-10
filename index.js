@@ -1,9 +1,14 @@
 const express = require("express");
 const { connectToMongoDB } = require('./connect');
-const urlRoute = require('./routes/url');
-const URL = require('./models/url');
 const path = require('path')
+const cookieParser = require('cookie-parser')
+const { restrictToLoggedinUserOnly, checkAuth } = require('./middleware/auth')
+const URL = require('./models/url');
+
+const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRouter')
+const userRoute = require('./routes/user')
+
 
 const app = express();
 const PORT = 8001;
@@ -27,7 +32,13 @@ app.get("/test", async (req, res) => {
 // Middleware 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use('/url', urlRoute)
+app.use(cookieParser());
+
+
+
+
+app.use('/url', restrictToLoggedinUserOnly, urlRoute)
+app.use('/user', checkAuth, userRoute)
 app.use('/', staticRoute)
 
 // Redirect route
