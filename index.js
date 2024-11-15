@@ -38,8 +38,8 @@ app.use(cookieParser());
 
 
 app.use('/url', restrictToLoggedinUserOnly, urlRoute)
-app.use('/user', checkAuth, userRoute)
-app.use('/', staticRoute)
+app.use('/user',  userRoute)
+app.use('/', checkAuth,staticRoute)
 
 // Redirect route
 app.get('/url/:shortId', async (req, res) => {

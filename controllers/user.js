@@ -17,9 +17,10 @@ async function handleUserSignUp(req, res) {
         });
 
         return res.redirect('/login');
+        // return res.redirect('home');
     } catch (error) {
         console.error("Error in sign-up:", error);
-        return res.render('signup', { error: "Sign-up failed. Please try again." });
+        return res.render('home', { error: "Sign-up failed. Please try again." });
     }
 }
 
@@ -27,10 +28,12 @@ async function handleUserLogin(req, res) {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email});
 
         if (!user) {
-            return res.render('login', { error: "Invalid Username or Password" });
+            return res.render("login", { 
+                error: "Invalid Username or Password" ,
+            });
         }
 
         // Compare the entered password with the hashed password in the database
@@ -42,10 +45,11 @@ async function handleUserLogin(req, res) {
 
         // Set session ID and cookie
         const sessionId = uuidv4();
-        setUser(sessionId, user);
+        setUser(sessionId,user)
+        // const token = setUser(user);
         res.cookie('uid', sessionId);
-
         return res.redirect('/');
+        
     } catch (error) {
         console.error("Error in login:", error);
         return res.render('login', { error: "Login failed. Please try again." });
