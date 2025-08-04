@@ -4,57 +4,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>URL Shortener</title>
+
+    <!-- ✅ Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <h1>URL Shortener</h1>
+<body class="bg-light">
 
-    <% if (locals.id) { %>
-        <p>URL Generated: http://localhost:8001/url/<%= id %>
-        </p>
+    <div class="container py-5">
+        <h1 class="text-center mb-4">URL Shortener</h1>
+
+        <% if (locals.id) { %>
+            <div class="alert alert-success text-center">
+                URL Generated: <a href="http://localhost:8001/url/<%= id %>" target="_blank">http://localhost:8001/url/<%= id %></a>
+            </div>
         <% } %>
 
-            <div>
-                <form method="POST" action="/url">
-                    <label>Enter Your Original URL</label>
-                    <input type="text" name="url" placeholder="https://example.com" />
-                    <button type="submit">Generate</button>
-                </form>
-            </div>
+        <!-- URL Input Form -->
+        <div class="card p-4 mb-4 shadow-sm">
+            <form method="POST" action="/url">
+                <div class="mb-3">
+                    <label class="form-label">Enter Your Original URL</label>
+                    <input type="text" name="url" class="form-control" placeholder="https://example.com" required />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Generate</button>
+            </form>
+        </div>
 
-            <div>
-                <% if (locals.urls) { %>
-                    <table>
-                        <thead>
+        <!-- URL Table -->
+        <% if (locals.urls) { %>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>S.No</th>
+                            <th>Short ID</th>
+                            <th>Redirect URL</th>
+                            <th>Clicks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% urls.forEach((url, index)=> { %>
                             <tr>
-                                <th>S.No</th>
-                                <th>ShortID</th>
-                                <th>Redirect</th>
-                                <th>Clicks</th>
+                                <td><%= index + 1 %></td>
+                                <td><%= url.shortID %></td>
+                                <td><a href="<%= url.redirectURL %>" target="_blank"><%= url.redirectURL %></a></td>
+                                <td><%= url.visitHistory.length %></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <% urls.forEach((url, index)=> { %>
-                                <tr>
-                                    <td>
-                                        <%= index + 1 %>
-                                    </td>
-                                    <td>
-                                        <%= url.shortID %>
-                                    </td>
-                                    <td>
-                                        <%= url.redirectURL %>
-                                    </td>
-                                    <td>
-                                        <%= url.visitHistory.length %>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                        </tbody>
-                    </table>
-                    <% } %>
+                        <% }) %>
+                    </tbody>
+                </table>
             </div>
+        <% } %>
+    </div>
+
+    <!-- Optional Bootstrap JS (for future interactivity if needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
