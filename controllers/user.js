@@ -56,7 +56,20 @@ async function handleUserLogin(req, res) {
     }
 }
 
+
+async function handleUserLogout(req,res){
+    try {
+        // Clear the cookie by setting it to an empty value and past date
+        res.cookie('uid', '', { expires: new Date(0) });
+        return res.redirect('/login');
+    } catch (error) {
+        console.error("Error in logout:", error);
+        return res.render('home', { error: "Logout failed. Please try again." });
+    }
+}
+
 module.exports = {
     handleUserSignUp,
     handleUserLogin,
+    handleUserLogout,
 };
