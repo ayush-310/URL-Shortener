@@ -1,24 +1,43 @@
 const shortid = require("shortid");
 const URL = require('../models/url');
 
+// Example Express handler
 async function handleGenerateNewShortURL(req, res) {
-    const body = req.body;
+    const { url } = req.body;
+    const normalizedUrl = url.trim().toLowerCase();
 
-    if (!body.url) return res.status(400).json({ error: "url is required" });
+    const existingUrl = await URL.findOne({ redirectURL: normalizedUrl });
 
-    const shortID = shortid();
+    let shortID;
 
-    await URL.create({
-        shortID: shortID,  // Use the correct field name
-        redirectURL: body.url,
-        visitHistory: [],
-        createdBy: req.user._id,
-    });
+    if (existingUrl) {
+        // If the URL already exists, use its shortID and also show a alert box telling the user that the URL already exists
+        shortID = existingUrl.shortID;
 
-    return res.render('home', {
+        // Show an alert box with the existing short URL
+        res.locals.alert = {
+            type: "info",
+            message: "URL already exists. Here is your shortened URL:",
+            url: `http://localhost:8001/url/${shortID}`
+        };
+    } else {
+        shortID = shortid();
+        await URL.create({
+            shortID,
+            redirectURL: normalizedUrl,
+            visitHistory: [],
+            createdBy: req.user._id,
+        });
+    }
+
+    const urls = await URL.find({ createdBy: req.user._id });
+
+    return res.render("home", {
         id: shortID,
-    })
+        urls: urls,
+    });
 }
+
 
 async function handleGetAnalytics(req, res) {
     const shortId = req.params.shortId;
