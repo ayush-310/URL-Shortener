@@ -1,5 +1,6 @@
 const shortid = require("shortid");
 const URL = require('../models/url');
+const QRCode = require('qrcode');
 
 // Example Express handler
 async function handleGenerateNewShortURL(req, res) {
@@ -25,17 +26,37 @@ async function handleGenerateNewShortURL(req, res) {
             redirectURL: normalizedUrl,
             visitHistory: [],
             createdBy: req.user._id,
+            QR: await createQRCode(shortID),
         });
     }
 
+    // ✅ Generate QR Code
+    const qrCodeImage = await createQRCode(shortID);
+
+    // Get all URLs created by this user
     const urls = await URL.find({ createdBy: req.user._id });
 
     return res.render("home", {
         id: shortID,
         urls: urls,
-        alert: alertMessage
+        alert: alertMessage,
+        qrCode: qrCodeImage, // ✅ Pass QR code to template
     });
 }
+
+
+async function createQRCode(shortID) {
+    const url = `http://localhost:8001/url/${shortID}`;
+
+    try {
+        const qrCodeImage = await QRCode.toDataURL(url);
+        return qrCodeImage;
+    } catch (err) {
+        console.error("QR Code generation failed:", err);
+        return null;
+    }
+}
+
 
 
 

@@ -4,10 +4,10 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const { restrictToLoggedinUserOnly, checkAuth } = require('./middleware/auth')
 const URL = require('./models/url');
-
 const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRouter')
 const userRoute = require('./routes/user')
+const { createQRCode } = require('./controllers/url');
 
 
 const app = express();
@@ -22,9 +22,12 @@ connectToMongoDB("mongodb://localhost:27017/short-url").then(() =>
 app.set("view engine", "ejs")
 app.set("views", path.resolve('./views'))
 
+
+
 app.get("/test", async (req, res) => {
     const allUrls = await URL.find({});
-    return res.render("home", { title: "Dashboard", alert: null, id: null, urls: allUrls });
+    const qrCodeImage = await createQRCode(shortID);
+    return res.render("home", { title: "Dashboard", alert: null, id: null, urls: allUrls, qrCode: qrCodeImage });
 })
 
 // Middleware 

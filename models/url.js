@@ -12,6 +12,12 @@ const urlSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    QR:{
+        type: String,
+        required: false,
+        // Default QR code image URL, can be replaced with a generated QR code later
+        default: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/800px-QR_code_for_mobile_English_Wikipedia.svg.png"
+    },
     redirectURL: {
         type: String,
         required: true,
