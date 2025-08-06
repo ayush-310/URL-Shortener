@@ -6,18 +6,16 @@ async function handleGenerateNewShortURL(req, res) {
     const { url } = req.body;
     const normalizedUrl = url.trim().toLowerCase();
 
+    let shortID;
+    let alertMessage = null;
+
     const existingUrl = await URL.findOne({ redirectURL: normalizedUrl });
 
-    let shortID;
-
     if (existingUrl) {
-        // If the URL already exists, use its shortID and also show a alert box telling the user that the URL already exists
         shortID = existingUrl.shortID;
-
-        // Show an alert box with the existing short URL
-        res.locals.alert = {
+        alertMessage = {
             type: "info",
-            message: "URL already exists. Here is your shortened URL:",
+            message: "URL already exists:",
             url: `http://localhost:8001/url/${shortID}`
         };
     } else {
@@ -35,8 +33,10 @@ async function handleGenerateNewShortURL(req, res) {
     return res.render("home", {
         id: shortID,
         urls: urls,
+        alert: alertMessage
     });
 }
+
 
 
 async function handleGetAnalytics(req, res) {
