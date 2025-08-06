@@ -1,0 +1,13 @@
+<% if (locals.alert) { %>
+    <div id="urlAlert" class="alert alert-<%= alert.type %> d-flex justify-content-center align-items-center gap-3 text-center position-relative">
+        <p class="m-0"><%= alert.message %></p>
+        <a href="<%= alert.url %>" target="_blank" class="fw-medium"><%= alert.url %></a>
+        <small class="bg-danger text-white px-2 py-1 rounded d-inline-block"><span id="countdown">30</span>s</small>
+    </div>
+<% } else if (locals.id) { %>
+    <div id="urlAlert" class="alert alert-success d-flex justify-content-center align-items-center gap-3 text-center position-relative">
+        <p class="m-1">URL Generated:</p>
+        <a href="http://localhost:8001/url/<%= id %>" target="_blank" class="fw-medium">http://localhost:8001/url/<%= id %></a>
+        <small class="bg-danger text-white px-2 py-1 rounded d-inline-block"><span id="countdown">30</span>s</small>
+    </div>
+<% } %>

@@ -24,9 +24,7 @@ app.set("views", path.resolve('./views'))
 
 app.get("/test", async (req, res) => {
     const allUrls = await URL.find({});
-    return res.render("home", {
-        urls: allUrls,
-    })
+    return res.render("home", { title: "Dashboard", alert: null, id: null, urls: allUrls });
 })
 
 // Middleware 
@@ -38,8 +36,8 @@ app.use(cookieParser());
 
 
 app.use('/url', restrictToLoggedinUserOnly, urlRoute)
-app.use('/user',  userRoute)
-app.use('/', checkAuth,staticRoute)
+app.use('/user', userRoute)
+app.use('/', checkAuth, staticRoute)
 
 // Redirect route
 app.get('/url/:shortId', async (req, res) => {
