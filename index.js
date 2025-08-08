@@ -14,8 +14,8 @@ const { createQRCode } = require('./controllers/url');
 const app = express();
 const PORT = 8001;
 
-const dbURL = process.env.DB_URL
-connectToMongoDB(dbURL).then(() =>
+// const dbURL = process.env.DB_URL
+connectToMongoDB("mongodb+srv://shorturl:6m4xbXAoXjQZsj5U@cluster0.d2byisk.mongodb.net/short-url").then(() =>
     console.log('Mongodb connected')
 );
 
