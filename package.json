@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "type": "commonjs",
-
   "scripts": {
     "start": "nodemon index.js"
   },
@@ -12,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "bootstrap-icons": "^1.13.1",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.1",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",

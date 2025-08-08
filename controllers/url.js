@@ -17,7 +17,7 @@ async function handleGenerateNewShortURL(req, res) {
         alertMessage = {
             type: "info",
             message: "URL already exists:",
-            url: `http://localhost:8001/url/${shortID}`
+            url: `${process.env.BASE_URL}/url/${shortID}`
         };
     } else {
         shortID = shortid();
@@ -46,7 +46,7 @@ async function handleGenerateNewShortURL(req, res) {
 
 
 async function createQRCode(shortID) {
-    const url = `http://localhost:8001/url/${shortID}`;
+    const url = `${process.env.BASE_URL}/url/${shortID}`;
 
     try {
         const qrCodeImage = await QRCode.toDataURL(url);

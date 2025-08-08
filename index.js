@@ -1,4 +1,5 @@
 const express = require("express");
+require('dotenv').config();
 const { connectToMongoDB } = require('./connect');
 const path = require('path')
 const cookieParser = require('cookie-parser')
@@ -13,7 +14,8 @@ const { createQRCode } = require('./controllers/url');
 const app = express();
 const PORT = 8001;
 
-connectToMongoDB("mongodb://localhost:27017/short-url").then(() =>
+const dbURL = process.env.DB_URL
+connectToMongoDB(dbURL).then(() =>
     console.log('Mongodb connected')
 );
 
@@ -23,12 +25,23 @@ app.set("view engine", "ejs")
 app.set("views", path.resolve('./views'))
 
 
+const BASE_URL = process.env.BASE_URL;
 
 app.get("/test", async (req, res) => {
     const allUrls = await URL.find({});
-    const qrCodeImage = await createQRCode(shortID);
-    return res.render("home", { title: "Dashboard", alert: null, id: null, urls: allUrls, qrCode: qrCodeImage });
-})
+    const qrCodeImage = await createQRCode(shortID); // Ensure shortID is defined somewhere
+
+    return res.render("home", { 
+        title: "Dashboard", 
+        alert: null, 
+        id: null, 
+        urls: allUrls, 
+        qrCode: qrCodeImage,
+        BASE_URL // pass it to EJS
+    });
+});
+
+
 
 // Middleware 
 app.use(express.json());

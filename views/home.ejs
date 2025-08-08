@@ -3,7 +3,7 @@
 
 <%- include("partials/head") %>
 
-    <body class="bg-light">
+    <body class="bg-light py-5">
 
         <%- include("partials/navbar") %>
 
@@ -27,19 +27,7 @@
                                     </form>
                                 </div>
                             </div>
-                            <div class="col-md-12 mb-4">
-                                <div class="card p-4 shadow-sm">
-                                    <h4 class="mb-3">Search a URL</h4>
-                                    <form method="POST" action="/url">
-                                        <div class="mb-3">
-                                            <label class="form-label">Original URL</label>
-                                            <input type="text" name="url" class="form-control"
-                                                placeholder="https://example.com" required />
-                                        </div>
-                                        <button type="submit" class="btn btn-primary w-100">Search URL</button>
-                                    </form>
-                                </div>
-                            </div>
+
                         </div>
 
                         <!-- Right Column: URL Table -->
@@ -53,7 +41,8 @@
                                                 <tr>
                                                     <th>S.No</th>
                                                     <th>Short URL</th>
-                                                    <th>QR</th>
+                                                    <th class="text-center">QR</th>
+                                                    <th class="text-center"></th>
                                                     <th>Original URL</th>
                                                     <th>Clicks</th>
                                                 </tr>
@@ -61,28 +50,38 @@
                                             <tbody>
                                                 <% urls.forEach((url, index)=> { %>
                                                     <tr>
-                                                        <td>
+                                                        <td class="text-center align-middle">
                                                             <%= index + 1 %>
                                                         </td>
-                                                        <td>
+                                                        <td class="text-center align-middle">
                                                             <a class="text-decoration-none"
-                                                                href="http://localhost:8001/url/<%= url.shortID %>"
+                                                                href="<%= `${process.env.BASE_URL}/url/${url.shortID}` %>"
                                                                 target="_blank">
                                                                 <%= url.shortID %>
                                                             </a>
                                                         </td>
-                                                        <td>
+                                                        <td class="text-center align-middle">
                                                             <% if (url.QR) { %>
-                                                                <img class="w-100"src="<%= url.QR %>" alt="QR Code" />
+                                                                <img class="" style="width:100px; height:auto;"
+                                                                    src="<%= url.QR %>" alt="QR Code" />
                                                                 <% } %>
                                                         </td>
-                                                        <td class="d-flex flex-wrap">
+                                                        <td class="text-center align-middle">
+                                                            <a href="<%= url.QR %>"
+                                                                download="qr_<%= url.shortID %>.png">
+                                                                <img style="width:50px; height:auto;"
+                                                                    src="https://media.istockphoto.com/id/844294300/vector/download-icon-isolated-vector.jpg?s=612x612&w=0&k=20&c=VCmvy8uEoTQnt9W0kZzjEBplN_opDkGKF_eQTLfkivs="
+                                                                    alt="Download QR" />
+                                                            </a>
+                                                        </td>
+
+                                                        <td class="text-center align-middle">
                                                             <a class="text-decoration-none"
                                                                 href="<%= url.redirectURL %>" target="_blank">
                                                                 <%= url.redirectURL %>
                                                             </a>
                                                         </td>
-                                                        <td>
+                                                        <td class="text-center align-middle">
                                                             <%= url.visitHistory.length %>
                                                         </td>
                                                     </tr>
