@@ -41,6 +41,7 @@ async function handleGenerateNewShortURL(req, res) {
         urls: urls,
         alert: alertMessage,
         qrCode: qrCodeImage, // ✅ Pass QR code to template
+        baseUrl: process.env.BASE_URL,
     });
 }
 
