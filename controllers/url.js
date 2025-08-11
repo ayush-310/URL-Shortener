@@ -2,7 +2,18 @@ const shortid = require("shortid");
 const URL = require('../models/url');
 const QRCode = require('qrcode');
 
-// Example Express handler
+// Create QR Code helper
+async function createQRCode(shortID) {
+    const url = `${process.env.BASE_URL}/url/${shortID}`;
+    try {
+        return await QRCode.toDataURL(url);
+    } catch (err) {
+        console.error("QR Code generation failed:", err);
+        return null;
+    }
+}
+
+// Generate new short URL
 async function handleGenerateNewShortURL(req, res) {
     const { url } = req.body;
     const normalizedUrl = url.trim().toLowerCase();
@@ -10,64 +21,71 @@ async function handleGenerateNewShortURL(req, res) {
     let shortID;
     let alertMessage = null;
 
-    const existingUrl = await URL.findOne({ redirectURL: normalizedUrl });
-
-    if (existingUrl) {
-        shortID = existingUrl.shortID;
-        alertMessage = {
-            type: "info",
-            message: "URL already exists:",
-            url: `${process.env.BASE_URL}/url/${shortID}`
-        };
-    } else {
-        shortID = shortid();
-        await URL.create({
-            shortID,
+    try {
+        // Check if same user already has this URL
+        const existingUrl = await URL.findOne({
             redirectURL: normalizedUrl,
-            visitHistory: [],
-            createdBy: req.user._id,
-            QR: await createQRCode(shortID),
+            createdBy: req.user._id
         });
+
+        if (existingUrl) {
+            shortID = existingUrl.shortID;
+            alertMessage = {
+                type: "info",
+                message: "URL already exists for you:",
+                url: `${process.env.BASE_URL}/url/${shortID}`
+            };
+        } else {
+            shortID = shortid();
+            await URL.create({
+                shortID,
+                redirectURL: normalizedUrl,
+                visitHistory: [],
+                createdBy: req.user._id,
+                QR: await createQRCode(shortID),
+            });
+        }
+    } catch (err) {
+        if (err.code === 11000) {
+            // Handle Mongo duplicate key error
+            const existing = await URL.findOne({
+                redirectURL: normalizedUrl,
+                createdBy: req.user._id
+            });
+            if (existing) {
+                shortID = existing.shortID;
+                alertMessage = {
+                    type: "info",
+                    message: "URL already exists for you:",
+                    url: `${process.env.BASE_URL}/url/${shortID}`
+                };
+            }
+        } else {
+            console.error("Error creating short URL:", err);
+            return res.status(500).send("Internal Server Error");
+        }
     }
 
-    // ✅ Generate QR Code
     const qrCodeImage = await createQRCode(shortID);
-
-    // Get all URLs created by this user
     const urls = await URL.find({ createdBy: req.user._id });
 
     return res.render("home", {
         id: shortID,
-        urls: urls,
+        urls,
         alert: alertMessage,
-        qrCode: qrCodeImage, // ✅ Pass QR code to template
+        qrCode: qrCodeImage,
         baseUrl: process.env.BASE_URL,
     });
 }
 
-
-async function createQRCode(shortID) {
-    const url = `${process.env.BASE_URL}/url/${shortID}`;
-
-    try {
-        const qrCodeImage = await QRCode.toDataURL(url);
-        return qrCodeImage;
-    } catch (err) {
-        console.error("QR Code generation failed:", err);
-        return null;
-    }
-}
-
-
-
-
+// Get analytics
 async function handleGetAnalytics(req, res) {
     const shortId = req.params.shortId;
-    const result = await URL.findOne({ shortID: shortId }); // Use consistent field name
+    const result = await URL.findOne({ shortID: shortId });
 
-    // if (!result) {
-    //     return res.status(404).json({ error: "Short ID not found" }); // Handle not found
-    // }
+    if (!result) {
+        return res.status(404).json({ error: "Short ID not found" });
+    }
 
     return res.json({
         totalClicks: result.visitHistory.length,
